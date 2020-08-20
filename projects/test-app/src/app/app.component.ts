@@ -63,10 +63,11 @@ export class AppComponent implements AfterViewInit {
     this.activeObjId = id;
      
     // Attach the obj in the DOM
-    //this.objectContainerRef.detach();
+    this.objectContainerRef.detach();
+    
     setTimeout(() => {
       this.objectContainerRef.insert(componentInstance.hostView, 0);
-    }, 2000);
+    }, 100);
     
   }
 
