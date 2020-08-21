@@ -5,6 +5,8 @@ import {
 } from '@angular/core';
 
 import { ElementContainerComponent } from './element-container/element-container.component';
+import { ServicesService } from 'services';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-root',
@@ -20,11 +22,12 @@ export class AppComponent implements AfterViewInit {
   private activeObjId: number;
 
   constructor(private resolver: ComponentFactoryResolver, 
+              public serv: ServicesService, 
               @Inject(NgModuleRef) private moduleRef: NgModuleRef<any>,
               @Inject(Injector) private injector: Injector) {
   
-                this.objectContainerRefList = new Map();
-
+      this.objectContainerRefList = new Map();
+      this.serv.status = 1024;
   }
 
   ngAfterViewInit(): void { 
@@ -37,6 +40,21 @@ export class AppComponent implements AfterViewInit {
     } else {
       this.loadElement(0, "FIRST");
     }    
+  }
+
+  changeStatus() {
+    this.serv.status++;
+
+    /*
+    let componentInstance = this.objectContainerRefList.get(this.activeObjId);
+    if(componentInstance != null) {
+      if(this.serv === componentInstance.instance.service) {
+        console.log("Same service!", componentInstance.instance.service.status, this.serv.status);
+      } else {
+        console.error("Different service!", componentInstance.instance.service.status, this.serv.status);
+      }
+    }
+    */
   }
 
   loadElement(id: number, name: string) {
@@ -55,7 +73,8 @@ export class AppComponent implements AfterViewInit {
            
       // Set the properties
       componentInstance.instance.name = name;
-
+      componentInstance.instance.ownerWindow = this;
+      
       // Save the instance in the cache
       this.setObjectContainerRef(id, componentInstance);
     }
@@ -63,7 +82,7 @@ export class AppComponent implements AfterViewInit {
     this.activeObjId = id;
      
     // Attach the obj in the DOM
-    this.objectContainerRef.detach();
+    //this.objectContainerRef.detach();
     
     setTimeout(() => {
       this.objectContainerRef.insert(componentInstance.hostView, 0);
@@ -74,6 +93,10 @@ export class AppComponent implements AfterViewInit {
   private setObjectContainerRef(objectUid: number, componentInstance: any) {
       this.objectContainerRefList.delete(objectUid);
       this.objectContainerRefList.set(objectUid, componentInstance);
+  }
+
+  getService(): ServicesService {
+    return this.serv;
   }
 
 }
